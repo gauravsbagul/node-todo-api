@@ -2,6 +2,7 @@
 
 const expect = require("expect");
 const request = require("superTest");
+const { ObjectID } = require("mongodb");
 
 const { app } = require("./../server");
 const { Todo } = require("./../models/todo");
@@ -9,9 +10,11 @@ const { User } = require("./../models/user");
 
 const todos = [
   {
+    _id: new ObjectID(),
     text: "First test todo",
   },
   {
+    _id: new ObjectID(),
     text: "Second test todo",
   },
 ];
@@ -80,11 +83,32 @@ describe("POST /todos", () => {
 // describe("GET /todo", () => {
 //   it("should get all todo", (done) => {
 //     request(app)
-//       .get("todos")
+//       .get("/todos")
 //       .expect(200)
 //       .expect((res) => {
 //         expect(res.body.todos.length).toBe(2);
 //       })
+//       .end(done);
+//   });
+// });
+
+// describe("GET /todo/:id", () => {
+//   it("should return todo doc", (done) => {
+//     request(app)
+//       .get(`/todo/${todos[0]._id.toHexString()}`)
+//       .expect(200)
+//       .expect((res) => {
+//         expect(res.body.todo.text).toBe(todos[0].text);
+//       })
+//       .end(done);
+//   });
+// });
+
+// describe("GET /todo/:id", () => {
+//   it("should return todo doc not found", (done) => {
+//     request(app)
+//       .get(`/todo/${new ObjectID().toHexString()}`)
+//       .expect(404)
 //       .end(done);
 //   });
 // });

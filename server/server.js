@@ -39,6 +39,7 @@ app.get("/todos", (req, res) => {
 });
 
 app.get("/todo/:id", (req, res) => {
+  console.log("TCL:: /todo/:id req", req);
   const { id } = req.params;
   if (!ObjectID.isValid(id)) {
     return res.status(404).send({ error: "Not a valid id" });
