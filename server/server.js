@@ -2,6 +2,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const { ObjectID } = require("mongodb");
+const _ = require("lodash");
 
 const { mongoose } = require("./db/mongoose");
 const { Todo } = require("./models/todo");
@@ -83,6 +84,37 @@ app.delete("/todo/:id", (req, res) => {
     (err) => {
       console.log("TCL:: err", err);
       res.status(404).send(err);
+    }
+  );
+});
+
+app.patch("/todo/:id", (req, res) => {
+  console.log("TCL:: /todo/:id req", req);
+  const { id } = req.params;
+
+  var body = _.pick(req.body, ["text", "completed"]);
+  if (!ObjectID.isValid(id)) {
+    return res.status(404).send({ error: "Not a valid id" });
+  }
+
+  if (_.isBoolean(body.completed) && body.completed) {
+    body.completedAt = new Date().getTime();
+  } else {
+    body.completed = false;
+    body.completedAt = null;
+  }
+
+  Todo.findByIdAndUpdate(id, { $set: body }, { new: true }).then(
+    (todo) => {
+      console.log("TCL:: todo", todo);
+      if (!todo) {
+        return res.status(404).send({ message: "Todo not found" });
+      }
+      res.send({ todo });
+    },
+    (err) => {
+      console.log("TCL:: err", err);
+      res.status(400).send();
     }
   );
 });
