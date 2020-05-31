@@ -23,7 +23,6 @@ app.post("/todos", (req, res) => {
 
   todo.save().then(
     (doc) => {
-      console.log("TCL:: doc", doc);
       res.send(doc);
     },
     (err) => {
@@ -44,7 +43,6 @@ app.get("/todos", (req, res) => {
 });
 
 app.get("/todo/:id", (req, res) => {
-  console.log("TCL:: /todo/:id req", req);
   const { id } = req.params;
   if (!ObjectID.isValid(id)) {
     return res.status(404).send({ error: "Not a valid id" });
@@ -60,14 +58,12 @@ app.get("/todo/:id", (req, res) => {
       res.send({ todo });
     },
     (err) => {
-      console.log("TCL:: err", err);
       res.status(404).send(err);
     }
   );
 });
 
 app.delete("/todo/:id", (req, res) => {
-  console.log("TCL:: /todo/:id req", req);
   const { id } = req.params;
   if (!ObjectID.isValid(id)) {
     return res.status(404).send({ error: "Not a valid id" });
@@ -85,14 +81,12 @@ app.delete("/todo/:id", (req, res) => {
       res.send({ todo, message: "findByIdAndRemove removed " });
     },
     (err) => {
-      console.log("TCL:: err", err);
       res.status(404).send(err);
     }
   );
 });
 
 app.patch("/todo/:id", (req, res) => {
-  console.log("TCL:: /todo/:id req", req);
   const { id } = req.params;
 
   var body = _.pick(req.body, ["text", "completed"]);
@@ -109,14 +103,12 @@ app.patch("/todo/:id", (req, res) => {
 
   Todo.findByIdAndUpdate(id, { $set: body }, { new: true }).then(
     (todo) => {
-      console.log("TCL:: todo", todo);
       if (!todo) {
         return res.status(404).send({ message: "Todo not found" });
       }
       res.send({ todo });
     },
     (err) => {
-      console.log("TCL:: err", err);
       res.status(400).send();
     }
   );
@@ -125,27 +117,40 @@ app.patch("/todo/:id", (req, res) => {
 //POST users
 app.post("/users", (req, res) => {
   var body = _.pick(req.body, ["email", "password"]);
-  console.log("TCL:: /users/body", body);
 
   var user = new User(body);
 
   user
     .save()
     .then(() => {
-      console.log("TCL:: user", JSON.stringify(user, undefined, 2));
       return user.generateAuthToken();
     })
     .then((token) => {
       res.header("x-auth", token).send(user);
     })
     .catch((err) => {
-      console.log("TCL:: err", err);
       res.status(400).send(err);
     });
 });
 
 app.get("/users/me", authenticate, (req, res) => {
   res.send(req.user);
+});
+
+app.post("/users/login", (req, res) => {
+  var body = _.pick(req.body, ["email", "password"]);
+
+  User.finByCredentials(body.email, body.password)
+    .then((user) => {
+      user.generateAuthToken().then((token) => {
+        res.send({ user, token });
+      });
+    })
+    .catch((err) => {
+      res.status(400).send(err);
+    });
+
+  // res.send(body);
 });
 
 app.listen(port, () => {

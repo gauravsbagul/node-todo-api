@@ -75,14 +75,36 @@ UserSchema.statics.findByToken = function (token) {
   });
 };
 
+UserSchema.statics.finByCredentials = function (email, password) {
+  var User = this;
+  console.log("TCL:: UserSchema.statics.finByCredentials -> User", User);
+
+  return User.findOne({ email }).then((user) => {
+    console.log("TCL:: UserSchema.statics.finByCredentials -> user", user);
+    if (!user) {
+      return Promise.reject();
+    }
+
+    return new Promise((resolve, reject) => {
+      bcrypt.compare(password, user.password, (err, res) => {
+        console.log("TCL:: UserSchema.statics.finByCredentials -> res", res);
+        console.log("TCL:: UserSchema.statics.finByCredentials -> err", err);
+        if (res) {
+          resolve(user);
+        } else {
+          reject();
+        }
+      });
+    });
+  });
+};
+
 UserSchema.pre("save", function (next) {
   var user = this;
 
   if (user.isModified("password")) {
     bcrypt.genSalt(10, (err, salt) => {
-      console.log("TCL:: salt", salt);
       bcrypt.hash(user.password, salt, (err, hash) => {
-        console.log("TCL:: hash", hash);
         user.password = hash;
         next();
       });
