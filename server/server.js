@@ -122,6 +122,28 @@ app.patch("/todo/:id", (req, res) => {
   );
 });
 
+//POST users
+app.post("/users", (req, res) => {
+  var body = _.pick(req.body, ["email", "password"]);
+  console.log("TCL:: /users/body", body);
+
+  var user = new User(body);
+
+  user
+    .save()
+    .then(() => {
+      console.log("TCL:: user", JSON.stringify(user, undefined, 2));
+      return user.generateAuthToken();
+    })
+    .then((token) => {
+      res.header("x-auth", token).send(user);
+    })
+    .catch((err) => {
+      console.log("TCL:: err", err);
+      res.status(400).send(err);
+    });
+});
+
 app.listen(port, () => {
   console.log(`Started up at ${port}`);
 });
