@@ -62,6 +62,31 @@ app.get("/todo/:id", (req, res) => {
   );
 });
 
+app.delete("/todo/:id", (req, res) => {
+  console.log("TCL:: /todo/:id req", req);
+  const { id } = req.params;
+  if (!ObjectID.isValid(id)) {
+    return res.status(404).send({ error: "Not a valid id" });
+  }
+
+  Todo.findByIdAndRemove({
+    _id: id,
+  }).then(
+    (todo) => {
+      if (!todo) {
+        return res
+          .status(404)
+          .send({ error: "findByIdAndRemove Id does not match" });
+      }
+      res.send({ todo, message: "findByIdAndRemove removed " });
+    },
+    (err) => {
+      console.log("TCL:: err", err);
+      res.status(404).send(err);
+    }
+  );
+});
+
 app.listen(port, () => {
   console.log(`Started up at ${port}`);
 });
