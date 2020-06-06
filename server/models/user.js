@@ -77,22 +77,18 @@ UserSchema.statics.findByToken = function (token) {
 
 UserSchema.statics.finByCredentials = function (email, password) {
   var User = this;
-  console.log("TCL:: UserSchema.statics.finByCredentials -> User", User);
 
   return User.findOne({ email }).then((user) => {
-    console.log("TCL:: UserSchema.statics.finByCredentials -> user", user);
     if (!user) {
-      return Promise.reject();
+      return Promise.reject("User dose not exist");
     }
 
     return new Promise((resolve, reject) => {
       bcrypt.compare(password, user.password, (err, res) => {
-        console.log("TCL:: UserSchema.statics.finByCredentials -> res", res);
-        console.log("TCL:: UserSchema.statics.finByCredentials -> err", err);
         if (res) {
           resolve(user);
         } else {
-          reject();
+          reject("Wrong Password");
         }
       });
     });
@@ -113,6 +109,17 @@ UserSchema.pre("save", function (next) {
     next();
   }
 });
+
+UserSchema.methods.removeToken = function (token) {
+  var user = this;
+  return user.update({
+    $pull: {
+      tokens: {
+        token,
+      },
+    },
+  });
+};
 
 var User = mongoose.model("User", UserSchema);
 
