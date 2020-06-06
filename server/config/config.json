@@ -1,6 +1,6 @@
 {
 
-    "text": {
+    "test": {
         "PORT": 3000,
         "MONGODB_URI": "mongodb://localhost:27017/TodoAppTest",
         "JWT_SECRET": "ubicnci832hfi7ic79ecnihdewjdie7"
