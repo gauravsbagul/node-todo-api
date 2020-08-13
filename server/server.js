@@ -163,20 +163,20 @@ app.post("/users/login", (req, res) => {
 });
 
 app.delete("/users/me/token", authenticate, (req, res) => {
-  console.log("TCL:: req.token", req.token);
+  // console.log("TCL:: req.token", req.token);
   req.user.removeToken(req.token).then(
     () => {
       res.status(200).send();
     },
     (err) => {
-      console.log("TCL:: err", err);
+      // console.log("TCL:: err", err);
       res.status(400).send(err);
     }
   );
 });
 
 app.listen(port, () => {
-  console.log(`Started at ${port}`);
+  // console.log(`Started at ${port}`);
 });
 
 module.exports = { app };
